@@ -2,10 +2,10 @@
 {
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  boot.loader = {
-    systemd-boot.enable = true;
-    efi.canTouchEfiVariables = true;
-  }; 
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.tmp.cleanOnBoot = true;
+  boot.initrd.systemd.enable = true;
 
   time.timeZone = "Europe/Paris";
 
@@ -22,17 +22,11 @@
     LC_TIME = "fr_FR.UTF-8";
   };
 
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
   users.users = {
-    switchcodeur = {
+    admin = {
       isNormalUser = true;
-      description = "switchcodeur";
-      extraGroups = [ "networkmanager" "wheel" ];
-      packages = with pkgs; [];
+      initialPassword = "admin";
+      extraGroups = [ "wheel" ];
     };
   };  
 

@@ -1,29 +1,54 @@
 {
-  disko.devices = {
-    disk.sda = {
-      type = "disk";
-      device = "/dev/sda";
+  fileSystems."/nix".neededForBoot = true;
+  
+  disko.devices.nodev = {
+    "/" = {
+      fsType = "tmpfs";
+      mountOptions = [
+        "size=25%"
+        "mode=755"
+      ];
+    };
+  };
+
+  disko.devices.disk.main = {
+    type = "disk";
+    device = "/dev/sda";
+
+    content.type = "gpt";
+
+    content.partitions.boot = {
+      size = "1M";
+      type = "EF02";
+    };
+
+    content.partitions.esp = {
+      size = "128M";
+      type = "EF00";
+    
       content = {
-        type = "gpt";
-        partitions = {
-          ESP = {
-            priority = 1;
-            type = "EF00";
-            start = "1M";
-            size = "128M";
-            content = {
-              type = "filesystem";
-              format = "vfat";
-              mountpoint = "/boot";
-            };
+        type = "filesystem";
+        format = "vfat";
+        mountpoint = "/boot";
+      };
+    };
+    
+    content.partitions.root = {
+      size = "100%";
+
+      content = {
+        type = "btrfs";
+        extraArgs = [ "-f" ];
+        
+        subvolumes = {
+          "/persistent" = {
+            mountOptions = [ "subvol=persist" "noatime" ];
+            mountpoint = "/persistent";
           };
-          root = {
-            size = "100%";
-            content = {
-              type = "btrfs";
-              extraArgs = [ "-f" ];
-              mountpoint = "/";
-            };
+
+          "/nix" = {
+            mountOptions = [ "subvol=nix" "noatime" ];
+            mountpoint = "/nix";
           };
         };
       };
