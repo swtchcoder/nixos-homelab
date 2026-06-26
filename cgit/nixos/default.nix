@@ -2,8 +2,14 @@
 {
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.systemd-boot.enable = false;
+  boot.loader.grub = {
+    enable = true;
+    efiSupport = true;
+    efiInstallAsRemovable = true;
+    devices = [ "/dev/sda" ];
+  };
+  boot.loader.efi.canTouchEfiVariables = false;
   boot.tmp.cleanOnBoot = true;
   boot.initrd.systemd.enable = true;
 
